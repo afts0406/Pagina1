@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Amor Pixelado</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Courier New', cursive;
+      background: url('img.png') no-repeat center center fixed;
+      background-size: cover;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .animated-item {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      animation: floatUp 7s infinite ease-in;
+      z-index: 1;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-600px); opacity: 0; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: white;
+      padding: 1em;
+      font-size: 1.3em;
+      background-color: rgba(0, 0, 0, 0.5);
+      margin: 10% auto;
+      width: 80%;
+      border-radius: 15px;
+    }
+
+    .character {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      z-index: 2;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .tabs {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 3;
+    }
+
+    .tab-button {
+      background-color: rgba(255,255,255,0.7);
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tab-content {
+      display: none;
+      z-index: 2;
+      position: relative;
+      margin-top: 100px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .tab-content img {
+      width: 80%;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        font-size: 1em;
+        margin-top: 20%;
+      }
+      .character {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <div class="tabs">
+    <button class="tab-button" onclick="activateTab('tab1')">Inicio</button>
+    <button class="tab-button" onclick="activateTab('tab2')">Feliz día de la novia</button>
+    <button class="tab-button" onclick="checkPassword()">Feliz mes</button>
+  </div>
+
+  <div id="tab1" class="tab-content active">
+    <div class="container">
+      Diana, eres la luz de mis días y la calma de mis noches. Cada momento a tu lado se vuelve mágico. Gracias por ser mi compañera de aventuras, por compartir tus sueños y por llenar mi mundo de ternura, tranquilidad, y felicidad... ¡te amo!
+    </div>
+    <div class="character" style="top: 70%; left: 30%;">
+      <img src="novio.png" alt="novio" style="width: 100%; height: 100%;">
+    </div>
+    <div class="character" style="top: 70%; left: 60%;">
+      <img src="novia.png" alt="novia" style="width: 100%; height: 100%;">
+    </div>
+  </div>
+
+  <div id="tab2" class="tab-content">
+    <div class="container">
+      Válido para un día de compras con tu novio 💄🛍️
+      <img src="imagen1.jpg" alt="Feliz día de la novia">
+    </div>
+  </div>
+
+  <div id="tab3" class="tab-content">
+    <div class="container">
+      Te invito a vivir un momento rodeada de animalitos y naturaleza, te amo 🌳🐶🐮🐢
+      <img src="imagen2.jpg" alt="Feliz mes">
+    </div>
+  </div>
+
+  <div id="ytplayer" style="display:none;"></div>
+
+  <script>
+    // YouTube player embed
+    let player;
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('ytplayer', {
+        height: '0',
+        width: '0',
+        videoId: 'qMnOQtSyOAE',
+        playerVars: {
+          autoplay: 1,
+          loop: 1,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          playlist: 'qMnOQtSyOAE'
+        },
+        events: {
+          'onReady': (e) => e.target.setVolume(100)
+        }
+      });
+    }
+
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
+
+    let stars = Array(100).fill().map(() => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.5 + 0.5
+    }));
+
+    function drawStars() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = 'white';
+      stars.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+    }
+
+    function animateStars() {
+      drawStars();
+      stars.forEach(s => s.r = 0.5 + Math.random());
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+
+    window.addEventListener('resize', () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    });
+
+    let interval;
+    function activateTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      clearInterval(interval);
+      document.querySelectorAll('.animated-item').forEach(el => el.remove());
+
+      if (tabId === 'tab1') {
+        interval = setInterval(() => createAnimatedItem('❤️'), 700);
+      } else if (tabId === 'tab2') {
+        interval = setInterval(() => createAnimatedItem('💋'), 700);
+      } else if (tabId === 'tab3') {
+        interval = setInterval(() => {
+          const emojis = ['🐮', '🐢', '🐶'];
+          createAnimatedItem(emojis[Math.floor(Math.random() * emojis.length)]);
+        }, 800);
+      }
+    }
+
+    function checkPassword() {
+      const pw = prompt('Ingrese la contraseña para ver este contenido:');
+      if (pw === 'soyunanoviahermosa') {
+        activateTab('tab3');
+      } else {
+        alert('Contraseña incorrecta.');
+      }
+    }
+
+    function createAnimatedItem(content) {
+      const el = document.createElement('div');
+      el.className = 'animated-item';
+      el.textContent = content;
+      el.style.left = Math.random() * window.innerWidth + 'px';
+      el.style.top = window.innerHeight + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 8000);
+    }
+  </script>
+</body>
+</html>
